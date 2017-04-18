@@ -5,11 +5,7 @@ This application was developed for the mobile computing class (CSE350), taught b
 # Required Technologies
 Android SDK 23 (minimum 19)
 
-Tesseract OCR API
-AWS EC2 t2.micro instance running Ubuntu 14.04
-Apache
-MySQL
-Flask framework
+Tesseract OCR API, AWS EC2 t2.micro instance running Ubuntu 14.04, Apache, MySQL. Flask
 
 # Server
 
