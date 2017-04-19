@@ -1,2 +1,5 @@
 notes.txt
 cse350-app-key-pair.pem
+.DS_Store
+.gitignore~
+.README.md~
