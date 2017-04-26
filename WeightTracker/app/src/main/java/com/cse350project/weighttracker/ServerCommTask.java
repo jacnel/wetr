@@ -35,7 +35,7 @@ public class ServerCommTask extends AsyncTask<String, Void, String> {
                 String encodedImage = params[1];
                 String data = URLEncoder.encode("encoded_image", "UTF-8") + "=" + URLEncoder.encode(encodedImage, "UTF-8");
 
-                URL url = new URL(link);
+                URL url = new URL("http://" + link);
                 URLConnection conn = url.openConnection();
 
                 conn.setDoOutput(true);
