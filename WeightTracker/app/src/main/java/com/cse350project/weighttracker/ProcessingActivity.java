@@ -1,11 +1,17 @@
 package com.cse350project.weighttracker;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 
 public class ProcessingActivity extends AppCompatActivity implements AsyncResponse {
 
@@ -16,17 +22,39 @@ public class ProcessingActivity extends AppCompatActivity implements AsyncRespon
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_processing);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         String encodedImage = "";
+        String filename = "";
+        String rows = "";
+        String cols = "";
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
-            encodedImage = extras.getString("encodedImage");
+            filename = extras.getString("encodedImage");
+            rows = extras.getString("numRows");
+            cols = extras.getString("numCols");
+        }
+
+        try {
+            FileInputStream inputStream = openFileInput(filename);
+            InputStreamReader streamReader = new InputStreamReader(inputStream);
+            BufferedReader bufferedReader = new BufferedReader(streamReader);
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while((line = bufferedReader.readLine()) != null) {
+                sb.append(line);
+            }
+            encodedImage = sb.toString();
+            Log.d(TAG, encodedImage);
+        }
+        catch (Exception e) {
+            Log.d(TAG, e.getMessage());
         }
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         if(encodedImage.compareTo("") != 0) {
             progressBar.setVisibility(View.VISIBLE);
-            sendImageToServer(encodedImage);
+            sendImageToServer(encodedImage, rows, cols);
         }
         else {
             Log.e(TAG, "Error: no encoded image...");
@@ -41,11 +69,11 @@ public class ProcessingActivity extends AppCompatActivity implements AsyncRespon
         setContentView(R.layout.processing_done);
     }
 
-    public void sendImageToServer(String image) {
+    public void sendImageToServer(String image, String rows, String cols) {
         // get the server communication ready
         ServerCommTask sendImage = new ServerCommTask(getString(R.string.server_domain));
         sendImage.setDelegate(this);
-        sendImage.execute("sendImage", image);
+        sendImage.execute("sendImage", image, rows, cols);
     }
 
     public void restart(View v) {

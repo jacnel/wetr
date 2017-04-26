@@ -33,7 +33,11 @@ public class ServerCommTask extends AsyncTask<String, Void, String> {
             // send information to the server via HTTP post request
             try {
                 String encodedImage = params[1];
+                String rows = params[2];
+                String cols = params[3];
                 String data = URLEncoder.encode("encoded_image", "UTF-8") + "=" + URLEncoder.encode(encodedImage, "UTF-8");
+                data += URLEncoder.encode("rows", "UTF-8") + "=" + URLEncoder.encode(rows, "UTF-8");
+                data += URLEncoder.encode("cols", "UTF-8") + "=" + URLEncoder.encode(cols, "UTF-8");
 
                 URL url = new URL("http://" + link);
                 URLConnection conn = url.openConnection();
@@ -58,6 +62,7 @@ public class ServerCommTask extends AsyncTask<String, Void, String> {
             }
             catch (Exception e){
                 Log.d(TAG, "Error: " + e.getMessage());
+                e.printStackTrace();
             }
         }
         return null;

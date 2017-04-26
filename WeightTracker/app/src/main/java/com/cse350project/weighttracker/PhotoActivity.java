@@ -1,5 +1,6 @@
 package com.cse350project.weighttracker;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 
 
 public class PhotoActivity extends AppCompatActivity{
@@ -73,7 +75,8 @@ public class PhotoActivity extends AppCompatActivity{
             public void onPictureTaken(byte[] data, Camera camera) {
                 Log.d(TAG, "onPictureTaken called");
                 // create the image bitmap
-                Bitmap image = BitmapFactory.decodeByteArray(data, 0, data.length);
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                Bitmap image = BitmapFactory.decodeByteArray(data, 0, data.length, options);
 
                 // create final bitmap and String encoding
                 // TODO: reduce picture to only include numbers
@@ -81,10 +84,26 @@ public class PhotoActivity extends AppCompatActivity{
                 image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 byte[] imageBytes = baos.toByteArray();
                 mEncodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+                Log.d(TAG, mEncodedImage);
+                Log.d(TAG, Integer.toString(options.outWidth));
+                Log.d(TAG, Integer.toString(options.outHeight));
+
+                String filename = "img.encoded";
+                try {
+                    FileOutputStream fos = openFileOutput(filename, Context.MODE_PRIVATE);
+                    fos.write(mEncodedImage.getBytes());
+                    fos.close();
+                }
+                catch (Exception e) {
+                    Log.d(TAG, e.getMessage());
+                }
+
 
                 // pass control to processing activity
                 Intent intent = new Intent(PhotoActivity.this, ProcessingActivity.class);
-                intent.putExtra("encodedImage", mEncodedImage);
+                intent.putExtra("encodedImage", filename);
+                intent.putExtra("numRows", Integer.toString(options.outHeight));
+                intent.putExtra("numCols", Integer.toString(options.outWidth));
                 finish();
                 startActivity(intent);
             }
