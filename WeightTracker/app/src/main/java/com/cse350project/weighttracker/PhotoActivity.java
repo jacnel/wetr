@@ -1,7 +1,9 @@
 package com.cse350project.weighttracker;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
@@ -13,6 +15,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
+import java.util.List;
 
 
 public class PhotoActivity extends AppCompatActivity{
@@ -21,18 +24,28 @@ public class PhotoActivity extends AppCompatActivity{
     private Camera mCamera;
     private CameraPreview mPreview;
     private String mEncodedImage = "";
+    Camera.PictureCallback jpeg;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         // Create an instance of Camera
         mCamera = getCameraInstance();
 
         // Create our Preview view and set it as the content of our activity.
         if(mCamera != null) {
+//            Camera.CameraInfo info = new Camera.CameraInfo();
+//            Camera.getCameraInfo(Camera.CameraInfo.CAMERA_FACING_BACK, info);
+//            int degrees = this.getWindowManager().getDefaultDisplay().getRotation();
+//            int rotate = (info.orientation - degrees + 360) % 360;
+//            Camera.Parameters params = mCamera.getParameters();
+//            params.setRotation(rotate + 1);
+//            mCamera.setParameters(params);
+
             mPreview = new CameraPreview(this, mCamera);
             FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
             preview.addView(mPreview);
@@ -55,7 +68,7 @@ public class PhotoActivity extends AppCompatActivity{
                     Log.d("getCameraInstance", "found camera");
                     c = Camera.open(i);
                     Camera.Parameters params = c.getParameters();
-                    params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                    params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
                     c.setParameters(params);
                     break;
                 }
@@ -69,7 +82,7 @@ public class PhotoActivity extends AppCompatActivity{
 
     public void captureImage(View view) {
 
-        Camera.PictureCallback jpeg = new Camera.PictureCallback() {
+        jpeg = new Camera.PictureCallback() {
 
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
@@ -83,10 +96,8 @@ public class PhotoActivity extends AppCompatActivity{
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 byte[] imageBytes = baos.toByteArray();
+                Log.d(TAG, image.toString());
                 mEncodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-                Log.d(TAG, mEncodedImage);
-                Log.d(TAG, Integer.toString(options.outWidth));
-                Log.d(TAG, Integer.toString(options.outHeight));
 
                 String filename = "img.encoded";
                 try {
@@ -102,14 +113,23 @@ public class PhotoActivity extends AppCompatActivity{
                 // pass control to processing activity
                 Intent intent = new Intent(PhotoActivity.this, ProcessingActivity.class);
                 intent.putExtra("encodedImage", filename);
-                intent.putExtra("numRows", Integer.toString(options.outHeight));
-                intent.putExtra("numCols", Integer.toString(options.outWidth));
                 finish();
                 startActivity(intent);
             }
         };
 
-        mCamera.takePicture(null, null, jpeg);
+        Camera.Parameters params = mCamera.getParameters();
+        List focusModes = params.getSupportedFocusModes();
+        if (focusModes.contains("auto")){
+            mCamera.autoFocus(new Camera.AutoFocusCallback() {
+                @Override
+                public void onAutoFocus(boolean success, Camera camera) {
+                    if(success) camera.takePicture(null, null, jpeg);
+                }
+            });
+        }else{
+            mCamera.takePicture(null, null, jpeg);
+        }
     }
 }
 
