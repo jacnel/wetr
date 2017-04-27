@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,17 +23,12 @@ public class ProcessingActivity extends AppCompatActivity implements AsyncRespon
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_processing);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         String encodedImage = "";
         String filename = "";
-        String rows = "";
-        String cols = "";
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
             filename = extras.getString("encodedImage");
-            rows = extras.getString("numRows");
-            cols = extras.getString("numCols");
         }
 
         try {
@@ -54,7 +50,7 @@ public class ProcessingActivity extends AppCompatActivity implements AsyncRespon
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         if(encodedImage.compareTo("") != 0) {
             progressBar.setVisibility(View.VISIBLE);
-            sendImageToServer(encodedImage, rows, cols);
+            sendImageToServer(encodedImage);
         }
         else {
             Log.e(TAG, "Error: no encoded image...");
@@ -67,13 +63,15 @@ public class ProcessingActivity extends AppCompatActivity implements AsyncRespon
         // do something with the result
         Log.d(TAG, "Response: " + result);
         setContentView(R.layout.processing_done);
+        TextView tv = (TextView) findViewById(R.id.resultTextView);
+        tv.setText(result);
     }
 
-    public void sendImageToServer(String image, String rows, String cols) {
+    public void sendImageToServer(String image) {
         // get the server communication ready
         ServerCommTask sendImage = new ServerCommTask(getString(R.string.server_domain));
         sendImage.setDelegate(this);
-        sendImage.execute("sendImage", image, rows, cols);
+        sendImage.execute("sendImage", image);
     }
 
     public void restart(View v) {
