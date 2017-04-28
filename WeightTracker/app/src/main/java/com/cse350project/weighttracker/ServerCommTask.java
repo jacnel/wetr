@@ -21,10 +21,11 @@ public class ServerCommTask extends AsyncTask<String, Void, String> {
 
     private String TAG = "ServerCommTask";
     private AsyncResponse asyncResponse;
-    private String link;
+    private String domain_name;
+    private int responseNum = 0;
 
-    public ServerCommTask(String link) {
-        this.link = link;
+    public ServerCommTask(String domain_name) {
+        this.domain_name = domain_name;
     }
 
     @Override
@@ -35,7 +36,7 @@ public class ServerCommTask extends AsyncTask<String, Void, String> {
                 String encodedImage = params[1];
                 String data = URLEncoder.encode("encoded_image", "UTF-8") + "=" + URLEncoder.encode(encodedImage, "UTF-8");
 
-                URL url = new URL("http://" + link);
+                URL url = new URL("http://" + domain_name + "/process_img");
                 URLConnection conn = url.openConnection();
 
                 conn.setDoOutput(true);
@@ -54,12 +55,49 @@ public class ServerCommTask extends AsyncTask<String, Void, String> {
                 reader.close();
 
                 Log.d(TAG, sb.toString());
+                responseNum = 1;
                 return sb.toString();
             }
             catch (Exception e){
                 Log.d(TAG, "Error: " + e.getMessage());
                 e.printStackTrace();
             }
+        }
+        else if (params[0].compareTo("submitWeight") == 0) {
+
+            try {
+                String name = params[1];
+                String weight = params[2];
+                String data = URLEncoder.encode("name", "UTF-8") + "=" + URLEncoder.encode(name, "UTF-8");
+                data += "&" + URLEncoder.encode("weight", "UTF-8") + "=" + URLEncoder.encode(weight, "UTF-8");
+
+                URL url = new URL("http://" + domain_name + "/submit");
+                URLConnection conn = url.openConnection();
+
+                conn.setDoOutput(true);
+                OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());
+                osw.write(data);
+                osw.flush();
+                osw.close();
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line;
+
+                while((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+                reader.close();
+
+                Log.d(TAG, sb.toString());
+                responseNum = 2;
+                return sb.toString();
+            }
+            catch (Exception e) {
+                Log.d(TAG, "Error: " + e.getMessage());
+                e.printStackTrace();
+            }
+
         }
         return null;
     }
@@ -71,6 +109,16 @@ public class ServerCommTask extends AsyncTask<String, Void, String> {
 
     @Override
     public void onPostExecute(String result) {
-        asyncResponse.processResponse(result);
+        switch(responseNum) {
+            case 1:
+                asyncResponse.processResponseOne(result);
+                break;
+            case 2:
+                asyncResponse.processResponseTwo(result);
+                break;
+            default:
+                break;
+        }
+
     }
 }
