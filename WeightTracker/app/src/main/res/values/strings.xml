@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">WeightTracker</string>
-    <string name="server_domain">http://ec2-35-165-150-242.us-west-2.compute.amazonaws.com/</string>
+    <string name="server_domain">ec2-35-167-186-207.us-west-2.compute.amazonaws.com</string>
 </resources>
