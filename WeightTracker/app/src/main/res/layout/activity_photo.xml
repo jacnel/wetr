@@ -6,19 +6,32 @@
     <FrameLayout
         android:id="@+id/camera_preview"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1">
+        android:layout_height="match_parent">
 
         <Button
             android:id="@+id/button_capture"
             android:text="Tap screen to take a photo"
             android:background="#70000000"
             android:textColor="#70ffffff"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_gravity="center|bottom"
+            android:layout_width="354dp"
+            android:layout_height="212dp"
+            android:layout_gravity="center"
             android:onClick="captureImage"
             android:alpha="0.3" />
+
+        <Button
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:text="Chart"
+            android:id="@+id/chartButton"
+            android:layout_gravity="right|top"
+            android:background="@drawable/roundedbutton"
+            android:layout_marginBottom="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="15dp"
+            android:textColor="#2c2c2c"
+            android:onClick="displayChart"/>
 
     </FrameLayout>
 </LinearLayout>

@@ -131,6 +131,12 @@ public class PhotoActivity extends AppCompatActivity{
             mCamera.takePicture(null, null, jpeg);
         }
     }
+
+    public void displayChart(View v) {
+        Intent intent = new Intent(this, GraphingActivity.class);
+        finish();
+        startActivity(intent);
+    }
 }
 
 
