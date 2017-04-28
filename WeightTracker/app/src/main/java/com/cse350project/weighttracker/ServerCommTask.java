@@ -54,7 +54,6 @@ public class ServerCommTask extends AsyncTask<String, Void, String> {
                 }
                 reader.close();
 
-                Log.d(TAG, sb.toString());
                 responseNum = 1;
                 return sb.toString();
             }
@@ -89,7 +88,6 @@ public class ServerCommTask extends AsyncTask<String, Void, String> {
                 }
                 reader.close();
 
-                Log.d(TAG, sb.toString());
                 responseNum = 2;
                 return sb.toString();
             }

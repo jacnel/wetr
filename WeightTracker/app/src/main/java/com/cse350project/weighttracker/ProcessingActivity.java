@@ -42,7 +42,6 @@ public class ProcessingActivity extends AppCompatActivity implements AsyncRespon
                 sb.append(line);
             }
             encodedImage = sb.toString();
-            Log.d(TAG, encodedImage);
         }
         catch (Exception e) {
             Log.d(TAG, e.getMessage());
@@ -60,7 +59,6 @@ public class ProcessingActivity extends AppCompatActivity implements AsyncRespon
     @Override
     public void processResponseOne(String result) {
         // do something with the result
-        Log.d(TAG, "Response: " + result);
         setContentView(R.layout.submit_weight);
         TextView tv = (TextView) findViewById(R.id.resultEditText);
         tv.setText(result);
@@ -68,9 +66,8 @@ public class ProcessingActivity extends AppCompatActivity implements AsyncRespon
 
     @Override
     public void processResponseTwo(String result) {
-        Log.d(TAG, "Response: " + result);
         setContentView(R.layout.submission_done);
-        TextView tv = (TextView) findViewById(R.id.textView);
+        TextView tv = (TextView) findViewById(R.id.resultTextView);
         tv.setText(result);
     }
 
