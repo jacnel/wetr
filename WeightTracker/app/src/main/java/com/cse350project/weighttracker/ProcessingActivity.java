@@ -1,16 +1,15 @@
 package com.cse350project.weighttracker;
 
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 
@@ -23,6 +22,8 @@ public class ProcessingActivity extends AppCompatActivity implements AsyncRespon
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_processing);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
 
         String encodedImage = "";
         String filename = "";
@@ -47,9 +48,7 @@ public class ProcessingActivity extends AppCompatActivity implements AsyncRespon
             Log.d(TAG, e.getMessage());
         }
 
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         if(encodedImage.compareTo("") != 0) {
-            progressBar.setVisibility(View.VISIBLE);
             sendImageToServer(encodedImage);
         }
         else {
@@ -59,12 +58,33 @@ public class ProcessingActivity extends AppCompatActivity implements AsyncRespon
     }
 
     @Override
-    public void processResponse(String result) {
+    public void processResponseOne(String result) {
         // do something with the result
         Log.d(TAG, "Response: " + result);
-        setContentView(R.layout.processing_done);
-        TextView tv = (TextView) findViewById(R.id.resultTextView);
+        setContentView(R.layout.submit_weight);
+        TextView tv = (TextView) findViewById(R.id.resultEditText);
         tv.setText(result);
+    }
+
+    @Override
+    public void processResponseTwo(String result) {
+        Log.d(TAG, "Response: " + result);
+        setContentView(R.layout.submission_done);
+        TextView tv = (TextView) findViewById(R.id.textView);
+        tv.setText(result);
+    }
+
+    public void submitWeight(View v) {
+        Double weight = Double.valueOf(((EditText) findViewById(R.id.resultEditText)).getText().toString());
+        Log.d(TAG, weight.toString());
+
+        setContentView(R.layout.activity_processing);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+
+        ServerCommTask submitWeight = new ServerCommTask(getString(R.string.server_domain));
+        submitWeight.setDelegate(this);
+        submitWeight.execute("submitWeight", "Jacob", weight.toString());
     }
 
     public void sendImageToServer(String image) {
