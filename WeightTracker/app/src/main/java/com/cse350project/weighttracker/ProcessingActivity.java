@@ -57,7 +57,7 @@ public class ProcessingActivity extends AppCompatActivity implements AsyncRespon
     }
 
     @Override
-    public void processResponseOne(String result) {
+    public void processImageResponse(String result) {
         // do something with the result
         setContentView(R.layout.submit_weight);
         TextView tv = (TextView) findViewById(R.id.resultEditText);
@@ -65,10 +65,15 @@ public class ProcessingActivity extends AppCompatActivity implements AsyncRespon
     }
 
     @Override
-    public void processResponseTwo(String result) {
+    public void submitWeightResponse(String result) {
         setContentView(R.layout.submission_done);
         TextView tv = (TextView) findViewById(R.id.resultTextView);
         tv.setText(result);
+    }
+
+    @Override
+    public void dataRequestResponse(String result) {
+        return;
     }
 
     public void submitWeight(View v) {

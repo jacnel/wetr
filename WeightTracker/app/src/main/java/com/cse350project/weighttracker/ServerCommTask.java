@@ -1,11 +1,7 @@
 package com.cse350project.weighttracker;
 
-import android.app.Activity;
-import android.content.res.Resources;
-import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ProgressBar;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -83,19 +79,49 @@ public class ServerCommTask extends AsyncTask<String, Void, String> {
                 StringBuilder sb = new StringBuilder();
                 String line;
 
-                while((line = reader.readLine()) != null) {
+                while ((line = reader.readLine()) != null) {
                     sb.append(line);
                 }
                 reader.close();
 
                 responseNum = 2;
                 return sb.toString();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.d(TAG, "Error: " + e.getMessage());
                 e.printStackTrace();
             }
 
+        }
+
+        else if (params[0].compareTo("dataRequest") == 0) {
+            try {
+                String period = params[1];
+                String data = URLEncoder.encode("period", "UTF-8") + "=" + URLEncoder.encode(period, "UTF-8");
+
+                URL url = new URL("http://" + domain_name + "/data_request");
+                URLConnection conn = url.openConnection();
+
+                conn.setDoOutput(true);
+                OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());
+                osw.write(data);
+                osw.flush();
+                osw.close();
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+                reader.close();
+
+                responseNum = 3;
+                return sb.toString();
+            } catch (Exception e) {
+                Log.d(TAG, "Error: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
         return null;
     }
@@ -109,11 +135,13 @@ public class ServerCommTask extends AsyncTask<String, Void, String> {
     public void onPostExecute(String result) {
         switch(responseNum) {
             case 1:
-                asyncResponse.processResponseOne(result);
+                asyncResponse.processImageResponse(result);
                 break;
             case 2:
-                asyncResponse.processResponseTwo(result);
+                asyncResponse.submitWeightResponse(result);
                 break;
+            case 3:
+                asyncResponse.dataRequestResponse(result);
             default:
                 break;
         }
